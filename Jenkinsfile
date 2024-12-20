@@ -2,13 +2,12 @@ pipeline {
     agent any
     environment {
         SSH_CRED = credentials('server_key')
-        def CONNECT = 'ssh -o StrictHostKeyChecking=no ubuntu@3.96.214.73'
+        CONNECT = 'ssh -o StrictHostKeyChecking=no -i $SSH_CRED ubuntu@3.96.214.73'
     }
     stages {
-        
         stage('Build') {
             steps {
-                echo 'building app'
+                echo 'Building app'
                 sh "pwd"
                 sh "ls"
                 sh "zip -r webapp.zip ."
@@ -21,22 +20,14 @@ pipeline {
                 echo 'Deploying app'
                 sshagent(['server_key']) {
                     sh 'scp -o StrictHostKeyChecking=no -i $SSH_CRED webapp.zip ubuntu@3.96.214.73:/home/ubuntu'
-                    // sh '''
-                    // $CONNECT << EOF
-                    // sudo apt install zip -y
-                    // sudo rm -rf /var/www/html/
-                    // sudo mkdir /var/www/html/
-                    // sudo unzip webapp.zip -d /var/www/html/
-                    // EOF
-                    // '''
-                    sh '$CONNECT "sudo apt install zip -y"'
-                    sh '$CONNECT "sudo rm -rf /var/www/html/"'
-                    sh '$CONNECT "sudo mkdir /var/www/html/"'
-                    sh '$CONNECT "sudo unzip webapp.zip -d /var/www/html/"
+                    sh "$CONNECT 'sudo apt install zip -y'"
+                    sh "$CONNECT 'sudo rm -rf /var/www/html/'"
+                    sh "$CONNECT 'sudo mkdir /var/www/html/'"
+                    sh "$CONNECT 'sudo unzip /home/ubuntu/webapp.zip -d /var/www/html/'"
                 }
             }
         }
-     
+
         stage('Clean-Up') {
             steps {
                 echo 'Remove existing files'
