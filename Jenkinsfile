@@ -19,7 +19,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying app'
-                sshagent(['server-key']) {
+                sshagent(['server_key']) {
                     sh 'scp -o StrictHostKeyChecking=no -i $SSH_CRED webapp.zip ubuntu@3.96.214.73:/home/ubuntu'
                     // sh '''
                     // $CONNECT << EOF
