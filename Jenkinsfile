@@ -1,30 +1,30 @@
-// my files
 pipeline {
     agent any
     environment {
         SSH_CRED = credentials('server_key')
-        CONNECT = 'ssh -o StrictHostKeyChecking=no -i $SSH_CRED ubuntu@3.96.214.73'
+        def CONNECT = 'ssh -o StrictHostKeyChecking=no ubuntu@3.96.214.73'
     }
     stages {
+        
         stage('Build') {
             steps {
-                echo 'Building app'
+                echo 'building app'
                 sh "pwd"
                 sh "ls"
                 sh "zip -r webapp.zip ."
                 sh "ls"
             }
         }
-
+        
         stage('Deploy') {
             steps {
                 echo 'Deploying app'
                 sshagent(['server_key']) {
                     sh 'scp -o StrictHostKeyChecking=no -i $SSH_CRED webapp.zip ubuntu@3.96.214.73:/home/ubuntu'
-                    sh "$CONNECT 'sudo apt install zip -y'"
-                    sh "$CONNECT 'sudo rm -rf /var/www/html/'"
-                    sh "$CONNECT 'sudo mkdir /var/www/html/'"
-                    sh "$CONNECT 'sudo unzip /home/ubuntu/webapp.zip -d /var/www/html/'"
+                    sh '$CONNECT "sudo apt install zip -y"'
+                    sh '$CONNECT "sudo rm -rf /var/www/html/"'
+                    sh '$CONNECT "sudo mkdir /var/www/html/"'
+                    sh '$CONNECT "sudo unzip webapp.zip -d /var/www/html/"'
                 }
             }
         }
